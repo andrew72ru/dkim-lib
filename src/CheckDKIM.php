@@ -24,6 +24,9 @@ class CheckDKIM
      * @param string $content RFC-2822 email message
      *
      * @throws InitializationException|LibraryException
+     *
+     * @noinspection PhpUndefinedMethodInspection
+     * @noinspection StaticInvocationViaThisInspection
      */
     public function validate(string $content, bool $checkDnsRecord = true): int
     {
@@ -44,6 +47,7 @@ class CheckDKIM
         foreach ($headers as $header) {
             $headerCRLF = \sprintf("%s\r\n", $header);
             $length = \strlen($headerCRLF);
+            /** @var \FFI\CData $buffer */
             $buffer = $library->new(\sprintf('unsigned char[%s]', $length + 1));
             \FFI::memcpy($buffer, $headerCRLF, $length);
             $buffer[$length] = 0;
@@ -126,6 +130,9 @@ class CheckDKIM
         return \is_string($txt) ? $txt : null;
     }
 
+    /**
+     * @throws LibraryException
+     */
     private function getHeaders(string $raw): string
     {
         $normalized = \str_replace(["\r\n", "\r"], "\n", $raw);
@@ -192,6 +199,9 @@ class CheckDKIM
         return $result;
     }
 
+    /**
+     * @throws InitializationException
+     */
     private function init(): \FFI
     {
         $cdef = <<<CDEF
