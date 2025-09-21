@@ -2,7 +2,7 @@
 
 A tiny PHP library to verify DKIM signatures of RFC‑2822 email messages using the OpenDKIM C library through PHP FFI.
 
-This package provides a simple wrapper around libopendkim’s verification API, exposing a single entry point (CheckDKIM) and a typed enum (StatusCode) that mirrors libopendkim’s dkim_stat return codes.
+This package provides a simple wrapper around libopendkim’s verification API, exposing a single entry point (`CheckDKIM`) and a typed enum (`StatusCode`) that mirrors libopendkim’s dkim_stat return codes.
 
 ## Features
 - Verifies DKIM signatures via `libopendkim` (OpenDKIM)
@@ -16,7 +16,7 @@ This package provides a simple wrapper around libopendkim’s verification API, 
 - PHP FFI enabled (ext-ffi)
 - OpenDKIM runtime library available at runtime (shared library, e.g. libopendkim.so or .dylib)
 
-See composer.json for exact PHP and extension constraints.
+See the `composer.json` for exact PHP and extension constraints.
 
 ## Installation
 
@@ -77,8 +77,12 @@ try {
     $code = $checker->validate($rawEmail, true); // returns an int matching StatusCode case
 } catch (Exception\InitializationException $e) {
     echo 'Initialization error: ' . $e->getMessage(); // OpenDKIM library could not be loaded
+
+    die(1);
 } catch (Exception\LibraryException $e) {
     echo 'Library error: ' . $e->getMessage(); // An error reported by libopendkim or the wrapper
+
+    die(1);
 }
 
 $status = StatusCode::from($code);
@@ -88,7 +92,7 @@ echo 'Description: ' . StatusCode::getDescription($status) . PHP_EOL;
 ```
 
 Notes:
-- The input must be a complete RFC‑2822 message (headers and body). The library will feed headers and body to libopendkim incrementally.
+- The input must be a complete [RFC‑2822 message](https://datatracker.ietf.org/doc/html/rfc2822) (headers and body). The library will feed headers and body to libopendkim incrementally.
 - Setting `$checkDnsRecord` to true performs a quick DNS TXT lookup for `<selector>._domainkey.<domain>` extracted from the DKIM-Signature header. If the record is missing, the method returns `StatusCode::DKIM_STAT_KEYFAIL` early.
 
 ## Return codes
