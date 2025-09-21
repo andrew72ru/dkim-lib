@@ -6,6 +6,20 @@ use DkimLib\Exception\{InitializationException, LibraryException};
 
 class CheckDKIM
 {
+    private static array $paths = [
+        'libopendkim.so.11',
+        '/usr/lib/x86_64-linux-gnu/libopendkim.so.11',
+        '/usr/lib/libopendkim.so.11',
+        'libopendkim.so',
+    ];
+
+    private array $potentialPaths;
+
+    public function __construct(array $libPath = [])
+    {
+        $this->potentialPaths = $libPath === [] ? self::$paths : $libPath;
+    }
+
     /**
      * @param string $content RFC-2822 email message
      *
@@ -196,16 +210,9 @@ class CheckDKIM
         dkim_stat dkim_options(DKIM_LIB *dkimlib, int op, int opt, void *ptr, size_t len);
 CDEF;
 
-        $potential = [
-            'libopendkim.so.11',
-            '/usr/lib/x86_64-linux-gnu/libopendkim.so.11',
-            '/usr/lib/libopendkim.so.11',
-            'libopendkim.so',
-        ];
-
         $ffi = null;
         $loadErrors = [];
-        foreach ($potential as $libName) {
+        foreach ($this->potentialPaths as $libName) {
             try {
                 $ffi = \FFI::cdef($cdef, $libName);
                 break;
