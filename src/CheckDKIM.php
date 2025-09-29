@@ -103,7 +103,7 @@ class CheckDKIM
 
     public function getDnsRecord(string $dkimHeader): string | null
     {
-        $dkimHeader = \str_replace(["\r\n", "\n", ' '], '', $dkimHeader);
+        $dkimHeader = \str_replace(["\r\n", "\n", "\t", ' '], '', $dkimHeader);
         $parts = \explode(';', $dkimHeader);
 
         $domain = null;
